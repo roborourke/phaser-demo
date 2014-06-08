@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Phaser Demo 3 - Sprites</title>
+    <script src="phaser.js"></script>
+  </head>
+  <body>
+
+    <div id="game"></div>
+
+    <script>
+
+      var game = new Phaser.Game(
+        800,                        // width
+        400,                        // height
+        Phaser.AUTO,                // render mode, CANVAS, WEBGL, HEADLESS, AUTO
+        'game',                     // game div id
+        {                           // Phaser.State object
+          preload: function() {
+
+            game.load.image( 'background', 'assets/runners/desert_BG.png' );
+            game.load.spritesheet(
+              'bird',
+              'assets/birds.png',
+              128,                   // frame width
+              128                    // frame height
+            );
+
+          },
+          create: function() {
+
+            // could use variables but you can store references anywhere really
+            this.bg = game.add.tileSprite( 0, 0, 800, 400, 'background' );
+
+            // tilesprites have a nice helper function that scroll the image
+            // arguments are x pixels per second and y pixels per second
+            this.bg.autoScroll( -50, 0 );
+
+            // add the bird
+            this.bird = game.add.sprite( game.world.centerX, game.world.centerY, 'bird' );
+
+            // set the birds anchor point so it's centered
+            this.bird.anchor.setTo( .5, .5 );
+
+
+          },
+          update: function() {
+
+
+          },
+          paused: function() {
+            // called when game loop is paused
+          },
+          pauseUpdate: function() {
+            // called during pause state, handle pause menu interactions here
+          },
+          render: function() {
+            // called constantly while phaser is rendering anything
+          },
+          shutdown: function() {
+            // called when state is switched or destroyed
+          }
+        },
+        true,                       // transparent canvas
+        true,                       // antialias graphics
+        null                        // optional physics config
+      );
+
+    </script>
+
+  </body>
+</html>
