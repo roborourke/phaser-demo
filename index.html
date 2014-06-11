@@ -13,6 +13,17 @@
     <!--[if lt IE 9]>
     <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
+	<style>
+	  .wrapper {
+		width: 1110px;
+	  }
+	  section {
+		width: 800px;
+	  }
+	  canvas {
+		max-width: 100%;
+	  }
+	</style>
   </head>
   <body>
     <div class="wrapper">
@@ -30,7 +41,7 @@
 
 
       </header>
-      <section>
+      <section><h1></h1>
 
 <p>Demo game put together in stages as part of an introduction to <a href="https://github.com/photonstorm" class="user-mention">@photonstorm</a>'s phaser.js at <a href="http://www.meetup.com/Liverpool-Javascript-user-group-client-server-side-JS/">Liverpool JS User Group</a></p>
 
@@ -62,6 +73,7 @@
           preload: function() {
 
 			game.load.baseURL = 'https://raw.githubusercontent.com/sanchothefat/phaser-demo/master/';
+			game.load.crossOrigin = 'anonymous';
 
             game.load.image( 'background', 'assets/runners/desert_BG.png' );
             game.load.image( 'background-bottom', 'assets/runners/desert_BG_bottom.png' );
