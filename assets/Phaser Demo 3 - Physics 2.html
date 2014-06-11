@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<!-- saved from url=(0033)http://localhost:8005/index7.html -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>Phaser Demo 3 - Physics 2</title>
+    <script src="./Phaser Demo 3 - Physics 2_files/phaser.js"></script>
+  </head>
+  <body>
+
+    <div id="game" style="overflow: hidden;"><canvas width="800" height="400" style="display: block; touch-action: none; -webkit-user-select: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></canvas></div>
+
+    <script>
+
+      var game = new Phaser.Game(
+        800,                        // width
+        400,                        // height
+        Phaser.AUTO,                // render mode, CANVAS, WEBGL, HEADLESS, AUTO
+        'game',                     // game div id
+        {                           // Phaser.State object
+          preload: function() {
+
+            game.load.image( 'background', 'assets/runners/desert_BG.png' );
+            game.load.spritesheet( 'bird', 'assets/birds.png', 128, 128 );
+
+          },
+          create: function() {
+
+            // could use variables but you can store references anywhere really
+            this.bg = game.add.tileSprite( 0, 0, 800, 400, 'background' );
+
+            // tilesprites have a nice helper function that scroll the image
+            // arguments are x pixels per second and y pixels per second
+            this.bg.autoScroll( -50, 0 );
+
+            // add the bird
+            this.bird = game.add.sprite( game.world.centerX - 100, game.world.centerY, 'bird' );
+
+            // set the birds anchor point so it's centered
+            this.bird.anchor.setTo( .5, .5 );
+
+            // lets animate the bird
+            this.bird.animations.add( 'flap', [ 0, 1 ] );
+            this.bird.animations.play( 'flap', 6, true );
+
+            // PHYSICS!
+            // Physics has to be enabled for each sprite individually to
+            // keep performance high
+
+            // start the physics system, we'll use ARCADE
+            game.physics.startSystem( Phaser.Physics.ARCADE );
+
+            // enable physics for the bird
+            // adds the sprite.body property
+            game.physics.arcade.enable( this.bird );
+
+            // lets make the bird experience some gravity
+            game.physics.arcade.gravity.set( 0, 180 );
+            // can be done differently for individual sprites
+            // also options
+            //this.bird.body.gravity.set( 0, 180 );
+
+            // lets keep the bird within our game screen!
+            this.bird.body.collideWorldBounds = true;
+
+
+            // we want a way to make the bird move up when some input occurs
+            // inputs can be applied to the whole game, or just an individual sprite
+            game.input.onTap.add( function() {
+
+              this.bird.body.velocity.y = -150;
+
+            }, this ); // 2nd arg is the value of 'this' in the callback
+
+          },
+          update: function() {
+
+            // change the rotation based on quickly we're rising or falling
+            this.bird.body.angularVelocity = this.bird.body.velocity.y;
+
+            // stop the bird from rotating too far!
+            if ( this.bird.angle > 80 ) {
+              this.bird.angle = 80;
+            }
+            if ( this.bird.angle < -15 ) {
+              this.bird.angle = -15;
+            }
+
+          },
+          paused: function() {
+            // called when game loop is paused
+          },
+          pauseUpdate: function() {
+            // called during pause state, handle pause menu interactions here
+          },
+          render: function() {
+            // called constantly while phaser is rendering anything
+          },
+          shutdown: function() {
+            // called when state is switched or destroyed
+          }
+        },
+        true,                       // transparent canvas
+        true,                       // antialias graphics
+        null                        // optional physics config
+      );
+
+    </script>
+
+  
+
+</body></html>

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Phaser Demo 2</title>
+    <script src="phaser.js"></script>
+  </head>
+  <body>
+
+    <div id="game"></div>
+
+    <script>
+
+      var game = new Phaser.Game(
+        800,                        // width
+        400,                        // height
+        Phaser.AUTO,                // render mode, CANVAS, WEBGL, HEADLESS, AUTO
+        'game',                     // game div id
+        {                           // Phaser.State object
+          preload: function() {
+
+            game.load.image( 'background', 'assets/runners/desert_BG.png' );
+
+          },
+          create: function() {
+
+            game.add.image( 0, 0, 'background' );
+
+            console.log( this );
+            // 'this' refers to the state object
+            // 'this.game' refers to the main game variable
+
+          },
+          update: function() {
+            // called on every visual update, move sprites/check collisions here
+          },
+          paused: function() {
+            // called when game loop is paused
+          },
+          pauseUpdate: function() {
+            // called during pause state, handle pause menu interactions here
+          },
+          render: function() {
+            // called constantly while phaser is rendering anything
+          },
+          shutdown: function() {
+            // called when state is switched or destroyed
+          }
+        },
+        true,                       // transparent canvas
+        true,                       // antialias graphics
+        null                        // optional physics config
+      );
+
+    </script>
+
+  </body>
+</html>
