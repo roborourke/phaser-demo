@@ -33,8 +33,8 @@
 
             // tilesprites have a nice helper function that scroll the image
             // arguments are x pixels per second and y pixels per second
-            this.bg.autoScroll( -20, 0 );
-            this.bgbot.autoScroll( -60, 0 );
+            this.bg.autoScroll( -200, 0 );
+            this.bgbot.autoScroll( -300, 0 );
 
             // add the bird
             this.bird = game.add.sprite( game.world.centerX - 100, game.world.centerY, 'bird' );
@@ -88,7 +88,7 @@
             this.zeppelins.physicsBodyType = Phaser.Physics.ARCADE;
 
             // timers are useful for making things happen repeatedly
-            game.time.events.loop( 5000, function() {
+            game.time.events.loop( 3000, function() {
 
               console.log( 'add zeppelin' );
 
@@ -106,7 +106,7 @@
               zep.body.immovable = true;
 
               // we need the sprite to move as well or we'll never see it
-              zep.body.velocity.x = -80;
+              zep.body.velocity.x = -250;
 
             }, this );
 
@@ -163,6 +163,10 @@
 
                 // stop animation
                 this.bird.animations.stop( 'flap' );
+
+                // drop zeppelin
+                zeppelin.body.allowGravity = true;
+                zeppelin.body.angularVelocity = -zeppelin.body.velocity.y;
 
               },
               function( bird, zeppelin ) {     // additional process callback
