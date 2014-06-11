@@ -61,6 +61,8 @@
         {                           // Phaser.State object
           preload: function() {
 
+			game.load.baseURL = 'https://raw.githubusercontent.com/sanchothefat/phaser-demo/master/';
+
             game.load.image( 'background', 'assets/runners/desert_BG.png' );
             game.load.image( 'background-bottom', 'assets/runners/desert_BG_bottom.png' );
             game.load.spritesheet( 'bird', 'assets/birds.png', 128, 128 );
