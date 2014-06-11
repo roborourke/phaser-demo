@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="stylesheets/styles.css">
     <link rel="stylesheet" href="stylesheets/pygment_trac.css">
     <script src="javascripts/scale.fix.js"></script>
+	<script src="//cdnjs.cloudflare.com/ajax/libs/phaser/2.0.4/phaser.min.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
     <!--[if lt IE 9]>
     <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
@@ -17,7 +18,7 @@
     <div class="wrapper">
       <header>
         <h1 class="header">Phaser Demo</h1>
-        <p class="header">Demo game put together in stages as part of an introduction to phaser.js</p>
+        <p class="header">These are some examples of a simple game at various stages of development</p>
 
         <ul>
           <li class="download"><a class="buttons" href="https://github.com/sanchothefat/phaser-demo/zipball/master">Download ZIP</a></li>
@@ -30,8 +31,6 @@
 
       </header>
       <section>
-        <h1>
-<a name="phaser-demo" class="anchor" href="#phaser-demo"><span class="octicon octicon-link"></span></a>Phaser Demo</h1>
 
 <p>Demo game put together in stages as part of an introduction to <a href="https://github.com/photonstorm" class="user-mention">@photonstorm</a>'s phaser.js at <a href="http://www.meetup.com/Liverpool-Javascript-user-group-client-server-side-JS/">Liverpool JS User Group</a></p>
 
@@ -46,13 +45,257 @@
 </li>
 <li>Browse the examples at <code>http://localhost:8005/indexXX.html</code>
 </li>
-</ol><div></div>
+</ol>
+
+<h2>Result:</h2>
+
+<div id="game"></div>
+
+    <script>
+
+      var game = new Phaser.Game(
+        800,                        // width
+        400,                        // height
+        Phaser.AUTO,                // render mode, CANVAS, WEBGL, HEADLESS, AUTO
+        'game',                     // game div id
+        {                           // Phaser.State object
+          preload: function() {
+
+            game.load.image( 'background', 'assets/runners/desert_BG.png' );
+            game.load.image( 'background-bottom', 'assets/runners/desert_BG_bottom.png' );
+            game.load.spritesheet( 'bird', 'assets/birds.png', 128, 128 );
+            game.load.image( 'restart', 'assets/restart.png' );
+            game.load.image( 'zeppelin', 'assets/zeppelin.png' )
+
+          },
+          create: function() {
+
+            // could use variables but you can store references anywhere really
+            this.bg = game.add.tileSprite( 0, 0, 800, 400, 'background' );
+            this.bgbot = game.add.tileSprite( 0, 344, 800, 57, 'background-bottom' );
+
+            // tilesprites have a nice helper function that scroll the image
+            // arguments are x pixels per second and y pixels per second
+            this.bg.autoScroll( -200, 0 );
+            this.bgbot.autoScroll( -300, 0 );
+
+            // add the bird
+            this.bird = game.add.sprite( game.world.centerX - 100, game.world.centerY, 'bird' );
+
+            // set the birds anchor point so it's centered
+            this.bird.anchor.setTo( .5, .5 );
+
+            // lets animate the bird
+            this.bird.animations.add( 'flap', [ 0, 1 ] );
+            this.bird.animations.play( 'flap', 6, true );
+
+            // make the bird a bit smaller
+            this.bird.scale.set( .75, .75 );
+
+            // PHYSICS!
+            // Physics has to be enabled for each sprite individually to
+            // keep performance high
+
+            // start the physics system, we'll use ARCADE
+            game.physics.startSystem( Phaser.Physics.ARCADE );
+
+            // enable physics for the bird
+            // adds the sprite.body property
+            game.physics.arcade.enable( this.bird );
+
+            // lets make the bird experience some gravity
+            game.physics.arcade.gravity.set( 0, 360 );
+            // can be done differently for individual sprites
+            // also options
+            //this.bird.body.gravity.set( 0, 180 );
+
+            // lets keep the bird within our game screen!
+            this.bird.body.collideWorldBounds = true;
+
+
+            // we want a way to make the bird move up when some input occurs
+            // inputs can be applied to the whole game, or just an individual sprite
+            game.input.onTap.add( function() {
+
+              this.bird.body.velocity.y = -200;
+
+            }, this ); // 2nd arg is the value of 'this' in the callback
+
+
+            // Phaser groups are an easy to work multiple similar objects
+            // You can collision detection between an entire group and a sprite
+            this.zeppelins = game.add.group();
+
+            // you can also enable physics for an entire group
+            this.zeppelins.enableBody = true;
+            this.zeppelins.physicsBodyType = Phaser.Physics.ARCADE;
+
+            // timers are useful for making things happen repeatedly
+            game.time.events.loop( 3000, function() {
+
+              console.log( 'add zeppelin' );
+
+              // add a zeppelin to the group at the right edge and a random height
+              var zep = this.zeppelins.create(
+                game.world.width + 100,
+                game.rnd.integerInRange( 0, game.world.height - 100 ),
+                'zeppelin'
+              );
+
+              // disable gravity for zeppelins
+              zep.body.allowGravity = false;
+
+              // makes sure that the impact from the bird won't affect it
+              zep.body.immovable = true;
+
+              // we need the sprite to move as well or we'll never see it
+              zep.body.velocity.x = -250;
+
+            }, this );
+
+            // Add some scoring text in the top left
+            this.score = 0;
+            this.scoretext = game.add.text(
+              5,
+              5,
+              'Score: ' + this.score,
+              { fill: '#fff', font: '20px Futura' }
+            );
+
+            // keep the bottom background on top of everything else for poops & giggles
+            game.world.bringToTop( this.bgbot );
+          },
+          update: function() {
+
+            // change the rotation based on how quickly we're rising or falling
+            this.bird.body.angularVelocity = this.bird.body.velocity.y;
+
+            // stop the bird from rotating too far!
+            if ( this.bird.angle > 60 ) {
+              this.bird.angle = 60;
+            }
+            if ( this.bird.angle < -15 ) {
+              this.bird.angle = -15;
+            }
+
+            // check bird collision with floor
+            if ( this.bird.body.onFloor() ) {
+
+              // set the dead bird frame to true
+              this.bird.frame = 2;
+
+              // pause the game
+              game.paused = true;
+
+            }
+
+            // bird collides with zeppelins
+            game.physics.arcade.overlap(       // could use collide too
+              this.bird,
+              this.zeppelins,
+              function( bird, zeppelin ) {     // callback on collision
+
+                // disable tap event to make the bird fly
+                game.input.onTap.removeAll();
+
+                // make it plummet
+                bird.body.velocity.y = 300;
+
+                // dead face
+                this.bird.frame = 2;
+
+                // stop animation
+                this.bird.animations.stop( 'flap' );
+
+                // drop zeppelin
+                zeppelin.body.allowGravity = true;
+                zeppelin.body.angularVelocity = -zeppelin.body.velocity.y;
+
+              },
+              function( bird, zeppelin ) {     // additional process callback
+                // return true or false here to alter collision result
+              },
+              this                             // callback context
+            );
+
+            // if we get past a zeppelin
+            this.zeppelins.forEach( function( zep ) {
+              if ( ! zep.scored && zep.x <= this.bird.x ) {
+
+                // it's a good idea to add checks by extending the sprite or group
+                // update is called very quickly multiple times a second
+                zep.scored = true;
+
+                // increase the score by editing the text content directly
+                this.score++;
+                this.scoretext.text = 'Score: ' + this.score;
+              }
+            }, this );
+
+          },
+          paused: function() {
+            // called when game loop is paused
+
+            this.result = game.add.text(
+              game.world.centerX,           // x
+              game.world.centerY,           // y
+              'Rubbish!',                   // text
+              {                             // style object (based on canvas & pixi.js)
+                font: '65px Futura',
+                fill: '#fff',
+                align: 'center'
+              }
+            );
+            this.result.anchor.set( .5, .5 );
+
+            // add a restart button
+            this.restart = game.add.button(
+              game.world.centerX,
+              game.world.centerY + 80,
+              'restart',
+              function() {
+                // restart the state
+                //game.state.restart();
+              }
+            );
+            this.restart.anchor.set( .5, .5 );
+
+            // the game itself can take inputs just not items within it!
+            game.input.onTap.add( function() {
+
+              game.state.restart();
+              game.paused = false;
+
+            }, this );
+
+            // if possible don't pause, just return false from the update loop
+
+          },
+          pauseUpdate: function() {
+
+
+          },
+          render: function() {
+            // called constantly while phaser is rendering anything
+          },
+          shutdown: function() {
+            // called when state is switched or destroyed
+          }
+        },
+        true,                       // transparent canvas
+        true,                       // antialias graphics
+        null                        // optional physics config
+      );
+
+    </script>
+
+<div></div>
       </section>
       <footer>
         <p><small>Hosted on <a href="http://pages.github.com">GitHub Pages</a> using the Dinky theme</small></p>
       </footer>
     </div>
     <!--[if !IE]><script>fixScale(document);</script><![endif]-->
-		
+
   </body>
 </html>
