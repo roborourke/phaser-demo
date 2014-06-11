@@ -96,7 +96,7 @@
             this.bird = game.add.sprite( game.world.centerX - 100, game.world.centerY, 'bird' );
 
             // set the birds anchor point so it's centered
-            this.bird.anchor.setTo( .5, .5 );
+            this.bird.anchor.set( .5, .5 );
 
             // lets animate the bird
             this.bird.animations.add( 'flap', [ 0, 1 ] );
@@ -144,9 +144,7 @@
             this.zeppelins.physicsBodyType = Phaser.Physics.ARCADE;
 
             // timers are useful for making things happen repeatedly
-            game.time.events.loop( 3000, function() {
-
-              console.log( 'add zeppelin' );
+            game.time.events.loop( 2000, function() {
 
               // add a zeppelin to the group at the right edge and a random height
               var zep = this.zeppelins.create(
@@ -154,6 +152,8 @@
                 game.rnd.integerInRange( 0, game.world.height - 100 ),
                 'zeppelin'
               );
+
+			  zep.anchor.set( .5, .5 );
 
               // disable gravity for zeppelins
               zep.body.allowGravity = false;
